@@ -193,7 +193,8 @@ class LiveMeasureClass:
         if self.plugin_action.isChecked():
             layer = self.iface.activeLayer()
             if not layer or not layer.isEditable() or (layer.geometryType() != QgsWkbTypes.LineGeometry and layer.geometryType() != QgsWkbTypes.PolygonGeometry):
-                self.iface.messageBar().pushWarning("LiveMeasure", "Select a line or polygon layer in edition mode.")
+                msg = self.tr_lang("Sélectionnez une couche de lignes ou de polygones en mode édition.","Select a line or polygon layer in edit mode.")
+                self.iface.messageBar().pushWarning("LiveMeasure", msg)
                 self.plugin_action.setChecked(False) 
                 return
             self.controller = DistanceDisplayController(self.iface)
@@ -213,3 +214,7 @@ class LiveMeasureClass:
             self.controller.cleanup()
             del self.controller
         self.plugin_action.setChecked(False)
+
+    def tr_lang(self, fr_msg, en_msg):
+        lang = QSettings().value('locale/userLocale', '')[0:2]
+        return fr_msg if lang == 'fr' else en_msg
