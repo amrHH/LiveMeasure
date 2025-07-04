@@ -24,12 +24,13 @@
 from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
+from qgis.core import  QgsWkbTypes
 
 # Initialize Qt resources from file resources.py
 from .resources import *
 # Import the code for the dialog
-from .Live_Measure_dialog import LiveMeasureClassDialog
 import os.path
+from .DistanceDisplayTool import  DistanceDisplayController
 
 
 class LiveMeasureClass:
@@ -181,20 +182,9 @@ class LiveMeasureClass:
 
 
     def run(self):
-        """Run method that performs all the real work"""
+        layer = self.iface.activeLayer()
+        if not layer or not layer.isEditable() or layer.geometryType() != QgsWkbTypes.LineGeometry:
+            self.iface.messageBar().pushWarning("LiveMeasure", "Select a line layer in edition mode.")
+            return
 
-        # Create the dialog with elements (after translation) and keep reference
-        # Only create GUI ONCE in callback, so that it will only load when the plugin is started
-        if self.first_start == True:
-            self.first_start = False
-            self.dlg = LiveMeasureClassDialog()
-
-        # show the dialog
-        self.dlg.show()
-        # Run the dialog event loop
-        result = self.dlg.exec_()
-        # See if OK was pressed
-        if result:
-            # Do something useful here - delete the line containing pass and
-            # substitute with your code.
-            pass
+        self.controller = DistanceDisplayController(self.iface)
