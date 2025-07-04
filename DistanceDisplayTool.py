@@ -53,9 +53,23 @@ class DistanceDisplayController(QObject):
 
         annotation = QgsTextAnnotation()
         annotation.setMapPosition(position)
-        annotation.setFrameSize(QSizeF(100, 30))
+        annotation.setFrameSize(QSizeF(140, 40))
+        html_text = f"""
+        <div style="
+            background-color: rgba(30, 30, 30, 0.8);
+            color: #fff;
+            font-weight: bold;
+            font-size: 14px;
+            border-radius: 8px;
+            padding: 6px 12px;
+            box-shadow: 3px 3px 8px rgba(0,0,0,0.5);
+            ">
+            Distance: <span style="color:#4CAF50;">{distance:.2f} m</span>
+        </div>
+        """
 
-        doc = QTextDocument(f"<b>{distance:.2f} m</b>")
+        doc = QTextDocument()
+        doc.setHtml(html_text)
         annotation.setDocument(doc)
 
         self.text_item = QgsMapCanvasAnnotationItem(annotation, self.canvas)

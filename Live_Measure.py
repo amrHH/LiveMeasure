@@ -192,8 +192,8 @@ class LiveMeasureClass:
             return
         if self.plugin_action.isChecked():
             layer = self.iface.activeLayer()
-            if not layer or not layer.isEditable() or layer.geometryType() != QgsWkbTypes.LineGeometry:
-                self.iface.messageBar().pushWarning("LiveMeasure", "Select a line layer in edition mode.")
+            if not layer or not layer.isEditable() or (layer.geometryType() != QgsWkbTypes.LineGeometry and layer.geometryType() != QgsWkbTypes.PolygonGeometry):
+                self.iface.messageBar().pushWarning("LiveMeasure", "Select a line or polygon layer in edition mode.")
                 self.plugin_action.setChecked(False) 
                 return
             self.controller = DistanceDisplayController(self.iface)
