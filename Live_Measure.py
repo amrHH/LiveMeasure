@@ -24,12 +24,13 @@
 from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
+from qgis.core import  QgsWkbTypes
 
 # Initialize Qt resources from file resources.py
 from .resources import *
 # Import the code for the dialog
-from .Live_Measure_dialog import LiveMeasureClassDialog
 import os.path
+from .DistanceDisplayTool import  DistanceDisplayController
 
 
 class LiveMeasureClass:
@@ -161,11 +162,14 @@ class LiveMeasureClass:
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
         icon_path = ':/plugins/Live_Measure/icon.png'
-        self.add_action(
+        self.plugin_action = self.add_action(
             icon_path,
-            text=self.tr(u''),
+            text=self.tr("LiveMeasure"),
             callback=self.run,
-            parent=self.iface.mainWindow())
+            parent=self.iface.mainWindow(),
+            add_to_menu=False,
+        )
+        self.plugin_action.setCheckable(True)
 
         # will be set False in run()
         self.first_start = True
@@ -178,23 +182,39 @@ class LiveMeasureClass:
                 self.tr(u'&LiveMeasure'),
                 action)
             self.iface.removeToolBarIcon(action)
+        if hasattr(self, 'digitizing_toolbar'):
+            for action in self.actions:
+                self.digitizing_toolbar.removeAction(action)
 
 
     def run(self):
-        """Run method that performs all the real work"""
-
-        # Create the dialog with elements (after translation) and keep reference
-        # Only create GUI ONCE in callback, so that it will only load when the plugin is started
-        if self.first_start == True:
-            self.first_start = False
-            self.dlg = LiveMeasureClassDialog()
-
-        # show the dialog
-        self.dlg.show()
-        # Run the dialog event loop
-        result = self.dlg.exec_()
-        # See if OK was pressed
-        if result:
-            # Do something useful here - delete the line containing pass and
-            # substitute with your code.
+        if not hasattr(self, 'plugin_action'):
+            return
+        if self.plugin_action.isChecked():
+            layer = self.iface.activeLayer()
+            if not layer or not layer.isEditable() or (layer.geometryType() != QgsWkbTypes.LineGeometry and layer.geometryType() != QgsWkbTypes.PolygonGeometry):
+                msg = self.tr_lang("Sélectionnez une couche de lignes ou de polygones en mode édition.","Select a line or polygon layer in edit mode.")
+                self.iface.messageBar().pushWarning("LiveMeasure", msg)
+                self.plugin_action.setChecked(False) 
+                return
+            self.controller = DistanceDisplayController(self.iface)
+            layer.editingStopped.connect(self._on_editing_stopped)
+        else:
+            if hasattr(self, 'controller'):
+                self.controller.cleanup()
+                del self.controller
+                
+    def _on_editing_stopped(self):
+        layer = self.iface.activeLayer()
+        try:
+            layer.editingStopped.disconnect(self._on_editing_stopped)
+        except Exception:
             pass
+        if hasattr(self, 'controller'):
+            self.controller.cleanup()
+            del self.controller
+        self.plugin_action.setChecked(False)
+
+    def tr_lang(self, fr_msg, en_msg):
+        lang = QSettings().value('locale/userLocale', '')[0:2]
+        return fr_msg if lang == 'fr' else en_msg

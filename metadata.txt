@@ -5,12 +5,14 @@
 [general]
 name=LiveMeasure
 qgisMinimumVersion=3.0
-description=Affiche en temps réel les distances, surfaces et autres mesures directement sur la carte pendant la numérisation d'entités.
-version=0.1
+about=This plugin provides dynamic distance and area measurement tools directly within the QGIS editing environment. As you draw line or polygon geometries, it calculates and displays the length or surface area in real time, helping ensure precision while digitizing.
+about[fr]=Ce plugin fournit des outils dynamiques de mesure de distance et de surface directement intégrés à l’environnement d’édition de QGIS. Lors du tracé de lignes ou de polygones, il calcule et affiche en temps réel la longueur ou la surface, permettant ainsi une meilleure précision pendant la numérisation.
+version=0.1.0
 author=Amr HAMADEH
 email=amr.grenoble@gmail.com
 
-about=Affiche en temps réel les distances, surfaces et autres mesures directement sur la carte pendant la numérisation d'entités.
+description=Displays real-time distances and areas directly on the map while digitizing features.
+description[fr]=Affiche en temps réel les distances et surfaces sur la carte pendant la numérisation d'entités.
 
 tracker=https://github.com/amrHH/LiveMeasure/issues
 repository=https://github.com/amrHH/LiveMeasure
@@ -23,7 +25,7 @@ hasProcessingProvider=no
 # changelog=
 
 # Tags are comma separated with spaces allowed
-tags=attribute edit, distance, editing, geometry, polygon, polyline, topography, python
+tags=attribute edit, distance, editing, geometry, polygon, polyline, topography, python , measure, surface, measurement
 
 homepage=https://github.com/amrHH/LiveMeasure
 category=Plugins
